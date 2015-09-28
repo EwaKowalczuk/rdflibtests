@@ -1,0 +1,8 @@
+#download generator and answers from:
+http://swat.cse.lehigh.edu/projects/lubm/
+
+
+java -cp 'classes:lib/*' edu.lehigh.swat.bench.uba.Generator -index 1 -seed 0 -onto 'http://lubm.man.poznan.pl'
+
+#each university will have separate owl file generated
+#the file names are very ugly (Windows-infatuation?)
