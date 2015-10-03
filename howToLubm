@@ -1,8 +1,75 @@
-#download generator and answers from:
-http://swat.cse.lehigh.edu/projects/lubm/
+#download ontology
+wget http://swat.cse.lehigh.edu/onto/univ-bench.owl
+#download generator
+wget http://swat.cse.lehigh.edu/projects/lubm/uba1.7.zip
+#download queries
+wget http://swat.cse.lehigh.edu/projects/lubm/queries-sparql.txt
+#download answers
+wget http://swat.cse.lehigh.edu/projects/lubm/answers.htm
 
+#unpack zips
+mkdir answers
+mv answers.zip answers
+cd answers
+unzip answers.zip
+cd ..
+mkdir uba1.7
+mv uba1.7.zip uba1.7
+cd uba1.7
+unzip uba1.7.zip
 
-java -cp 'classes:lib/*' edu.lehigh.swat.bench.uba.Generator -index 1 -seed 0 -onto 'http://lubm.man.poznan.pl'
+#create data for LUBM(0,0) -- they are reproducable
+java -cp 'classes:lib/*' edu.lehigh.swat.bench.uba.Generator -index 0 -seed 0 -onto 'http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl'
 
+#files will be created in parent directory of uba1.7
 #each university will have separate owl file generated
 #the file names are very ugly (Windows-infatuation?)
+#you can use the following script
+../rdflibtests/renameLubm.py .
+
+#load data files into Virtuoso
+#adjust a copy of provided virtuoso.ini
+mkdir db
+#start virtuoso
+$virtuosoPath/virtuoso/bin/virtuoso-t -f -c ../rdflibtests/virtuoso.ini
+#start virtuoso command line
+$virtuosoPath/virtuoso/bin/isql 1111 dba dba
+
+#in isql:
+#remove existing triples (the one which can be removed)
+rdf_global_reset();
+commit work;
+#check how many triples there are
+sparql select (count(*) as ?no)
+{
+	?s ?p ?o
+};
+#schedule batch load
+delete from db.dba.load_list;
+ld_dir ('/home/nuoritoveri/pcss/regulus/python/lubm', 'University*.owl', 'http://lubm.man.poznan.pl');
+#ensure you have 15 rows
+select count(*) from db.dba.load_list;
+#start load
+rdf_loader_run(); 
+commit work;
+#this might be very fast, ensure there are no error rows
+select * from db.dba.load_list where ll_error is not null;
+
+#issue first query from Lubm dataset
+#-- for up-to-date query check dataset, this demonstrates
+#that you have to use SPARQL + semicolon in isql
+#we also need to adjust resources - put them in <>
+SPARQL
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+SELECT ?X	
+WHERE
+{?X rdf:type ub:GraduateStudent .
+  ?X ub:takesCourse
+<http://www.Department0.University0.edu/GraduateCourse0>}
+;
+
+
+
+
+
