@@ -70,18 +70,35 @@ WHERE
 ;
 #I fixed queries using <> and put each query in a separate file in repository
 
-#TODO load ontology -- demonstrate inference
-
+###loading ontology for inference purposes
+#change the namespace in downloaded ontology to match the one used in generator:
+#this caused me many headaches...
+sed -i 's%http://swat.cse.lehigh.edu/onto/univ-bench.owl%http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl%g' univ-bench.owl
 #put TBox data in a special graph
+SPARQL CLEAR GRAPH <http://ontology.lubm.man.poznan.pl>;
 delete from db.dba.load_list;
 ld_dir ('/home/nuoritoveri/pcss/regulus/python/lubm', 'univ-bench.owl', 'http://ontology.lubm.man.poznan.pl');
 rdf_loader_run(); 
 commit work;
 select * from db.dba.load_list where ll_error is not null;
+#add trasitiveness to subClassOf and subPropertyOf
+SPARQL
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+INSERT DATA 
+{
+	GRAPH <http://ontology.lubm.man.poznan.pl>
+	{
+    	rdfs:subClassOf rdf:type owl:TransitiveProperty .
+    	rdfs:subPropertyOf rdf:type owl:TransitiveProperty
+	}
+}
+;
 #create ruleset based on TBox
 rdfs_rule_set('lubmruleset', 'http://ontology.lubm.man.poznan.pl');
-rdfs_rule_set('lubmruleset', 'http://lubm.man.poznan.pl');
 commit work;
+
 
 #now you can pose a query that requires inference
 #utilising a special pragma
@@ -89,26 +106,23 @@ SPARQL
 DEFINE  input:inference  'lubmruleset'
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
-SELECT ?X, ?Y, ?Z
-WHERE
-{?X rdf:type ub:GraduateStudent .
-  ?Y rdf:type ub:University .
-  ?Z rdf:type ub:Department .
-  ?X ub:memberOf ?Z .
-  ?Z ub:subOrganizationOf ?Y .
-  ?X ub:undergraduateDegreeFrom ?Y}
-;
-
-SPARQL
-PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
 SELECT ?X
 WHERE
-{?X rdf:type ub:Publication .
-  ?X ub:publicationAuthor 
-        http://www.Department0.University0.edu/AssistantProfessor0}
+{?X rdf:type ub:Professor}
 ;
 
 
-Django RDF Alchemy
-semantic django
+SPARQL
+DEFINE  input:inference  'lubmruleset'
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+SELECT *
+WHERE
+{
+	ub:GraduateStudent rdfs:subClassOf ?X .
+	?X ?P ?O
+}
+;
+
+#TODO differences in queries - see file: output

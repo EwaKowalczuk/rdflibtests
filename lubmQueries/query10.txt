@@ -10,3 +10,39 @@ WHERE
 {?X rdf:type ub:Student .
   ?X ub:takesCourse
 <http://www.Department0.University0.edu/GraduateCourse0>}
+#
+#
+# 
+#<owl:Class rdf:ID="Student">
+#  <rdfs:label>student</rdfs:label>
+#  <owl:intersectionOf rdf:parseType="Collection">
+#	  <owl:Class rdf:about="#Person" /> 
+#	  <owl:Restriction>
+#		  <owl:onProperty rdf:resource="#takesCourse" /> 
+#		  <owl:someValuesFrom>
+#			  <owl:Class rdf:about="#Course" /> 
+#		  </owl:someValuesFrom>
+#	  </owl:Restriction>
+#  </owl:intersectionOf>
+#</owl:Class>
+#
+#<owl:Class rdf:ID="GraduateStudent">
+#  <rdfs:label>graduate student</rdfs:label>
+#  <rdfs:subClassOf rdf:resource="#Person" /> 
+#  <rdfs:subClassOf>
+#	  <owl:Restriction>
+#		  <owl:onProperty rdf:resource="#takesCourse" /> 
+#		  <owl:someValuesFrom>
+#			  <owl:Class rdf:about="#GraduateCourse" /> 
+#		  </owl:someValuesFrom>
+#	  </owl:Restriction>
+#  </rdfs:subClassOf>
+#</owl:Class>
+#
+#
+#<owl:Class rdf:ID="GraduateCourse">
+#  <rdfs:label>Graduate Level Courses</rdfs:label>
+#  <rdfs:subClassOf rdf:resource="#Course" />
+#</owl:Class>
+#
+#
