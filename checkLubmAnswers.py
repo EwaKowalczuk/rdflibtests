@@ -40,23 +40,22 @@ ANSWER_FILE_PREFIX = 'answers_query'
 #from SPARQLWrapper import SPARQLWrapper, JSON
 
 query = """
-PREFIX dbo: <http://dbpedia.org/ontology/>
-PREFIX res: <http://dbpedia.org/resource/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-SELECT DISTINCT ?uri 
-WHERE {
-        ?uri dbo:starring res:Krzysztof_Kowalewski .
-}
+PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+SELECT ?X	
+WHERE
+{?X rdf:type ub:GraduateStudent .
+  ?X ub:takesCourse
+<http://www.Department0.University0.edu/GraduateCourse0>}
 """
 
-sparql = SPARQLWrapper.SPARQLWrapper("http://dbpedia.org/sparql")
+sparql = SPARQLWrapper.SPARQLWrapper(sparqlAddress)
 sparql.setQuery(query)
 sparql.setReturnFormat(SPARQLWrapper.JSON)
 results = sparql.query().convert()
 
 for result in results["results"]["bindings"]:
-	print(result["uri"]["value"])
+	print(result["X"]["value"])
 
 
 
