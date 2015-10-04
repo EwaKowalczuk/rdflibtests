@@ -4,13 +4,7 @@ import re
 import sys
 import subprocess
 import glob
-
-#TODO tidy
-import rdflib
-import rdfextras
-from rdflib import Graph, Literal, URIRef
-from rdflib.namespace import RDF, SKOS
-from rdflib.plugins.stores import sparqlstore
+import SPARQLWrapper
 
 #check if query result matches answer
 
@@ -43,7 +37,7 @@ ANSWER_FILE_PREFIX = 'answers_query'
 #    print(band)
 
 
-from SPARQLWrapper import SPARQLWrapper, JSON
+#from SPARQLWrapper import SPARQLWrapper, JSON
 
 query = """
 PREFIX dbo: <http://dbpedia.org/ontology/>
@@ -56,9 +50,9 @@ WHERE {
 }
 """
 
-sparql = SPARQLWrapper("http://dbpedia.org/sparql")
+sparql = SPARQLWrapper.SPARQLWrapper("http://dbpedia.org/sparql")
 sparql.setQuery(query)
-sparql.setReturnFormat(JSON)
+sparql.setReturnFormat(SPARQLWrapper.JSON)
 results = sparql.query().convert()
 
 for result in results["results"]["bindings"]:
