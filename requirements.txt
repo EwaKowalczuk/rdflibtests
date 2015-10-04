@@ -1,0 +1,6 @@
+rdflib==4.2.1
+rdfextras==0.4
+SPARQLWrapper==1.6.4
+pycurl==7.19.5.1
+urlgrabber==3.9.1
+-e git://github.com/gjhiggins/RDFAlchemy.git@4a46c698088f222c80fac58c874b6a0923eeda9f#egg=RDFAlchemy
