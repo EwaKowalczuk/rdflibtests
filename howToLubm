@@ -68,8 +68,31 @@ WHERE
   ?X ub:takesCourse
 <http://www.Department0.University0.edu/GraduateCourse0>}
 ;
+#I fixed queries using <> and put each query in a separate file in repository
 
+#TODO load ontology -- demonstrate inference
 
+#put TBox data in a special graph
+delete from db.dba.load_list;
+ld_dir ('/home/nuoritoveri/pcss/regulus/python/lubm', 'univ-bench.owl', 'http://ontology.lubm.man.poznan.pl');
+rdf_loader_run(); 
+commit work;
+select * from db.dba.load_list where ll_error is not null;
+#create ruleset based on TBox
+rdfs_rule_set('lubmruleset', 'http://ontology.lubm.man.poznan.pl');
+rdfs_rule_set('lubmruleset', 'http://lubm.man.poznan.pl');
+commit work;
 
+#now you can pose a query that requires inference
+#utilising a special pragma
+SPARQL
+DEFINE  input:inference  'lubmruleset'
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX ub: <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#>
+SELECT ?X
+WHERE
+{?X rdf:type ub:ResearchGroup .
+  ?X ub:subOrganizationOf <http://www.University0.edu>}
+;
 
 
