@@ -1,3 +1,6 @@
+#important:
+#SPARQLWrapper works under Python2
+
 #download ontology
 wget http://swat.cse.lehigh.edu/onto/univ-bench.owl
 #download generator
