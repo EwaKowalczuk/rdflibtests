@@ -3,6 +3,7 @@ import os
 import re
 import sys
 import subprocess
+import glob
 
 #check if query result matches answer
 
@@ -18,14 +19,15 @@ sparqlAddress = sys.argv[3]
 QUERY_FILE_PREFIX = 'query'
 ANSWER_FILE_PREFIX = 'answers_query'
 
-#TODO add inference!
+#TODO add inference
+#TODO use sets while comparing answers
         
-for queryFileName in os.listdir(queryDirectory):
-    fullQueryFileName = os.path.join(queryDirectory, queryFileName)
+for queryFileName in glob.glob(os.path.join(queryDirectory, QUERY_FILE_PREFIX + '*.txt')):
     #issue query
     #TODO use SPARQL instead of isql
     #TODO use rdflib instead of sparel
-    with open(fullQueryFileName) as queryFile:
+    with open(queryFileName) as queryFile:
+        print("---query: %s---" % queryFileName)
         query = [line.rstrip('\n') for line in queryFile.readlines() if not line.startswith('#')]
         query.insert(0, "SPARQL")
         query.append(";")
@@ -34,8 +36,9 @@ for queryFileName in os.listdir(queryDirectory):
         proc = subprocess.Popen(["/home/nuoritoveri/install/virtuoso/virtuoso/bin/isql" , "1111", "dba", "dba"], 
                 stdin = subprocess.PIPE, stdout = subprocess.PIPE, stderr = subprocess.PIPE, universal_newlines = True)
         stdout, stderr = proc.communicate(queryString)
-        print()
         print(stdout)
+        print()
+        print()
     #m = re.match('uba1.7\\\\(University.+.owl)', f)
     #if m:
     #    newname = m.groups()[0]
